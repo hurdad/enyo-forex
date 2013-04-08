@@ -35,10 +35,9 @@
 }
 
 
-
 .pullout {
 	position: absolute;
-	top: 57px;
+	top: 0;
 	right: 0;
 	bottom: 0;
 	width: 320px;
@@ -58,7 +57,7 @@
 	position: absolute;
 	height: 54px;
 	width: 50px;
-	bottom: 20px;
+	top: 10px;
 	left: -46px;
 	border-radius: 10px 0 0 10px;
 	background-color: #D8D8D8;
@@ -86,7 +85,7 @@
 
 .labeled-item-icon {
 	vertical-align: bottom;
-	padding-right: 5px;
+	margin-right: 15px;
 }
 
 .label-item-input {

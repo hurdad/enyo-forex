@@ -7,5 +7,6 @@ enyo.depends(
 	"LeftNav.js",
     "Chart.js",
     "Pullout.js",
-    "LabeledItem.js"
+    "LabeledItem.js",
+    "Summary.js"
  );

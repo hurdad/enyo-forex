@@ -7,7 +7,7 @@ enyo.kind({
 		icon: ""
 	},
 	components: [
-		{name: "icon", kind: "Image", classes: "labeled-item-icon"},
+		{name: "check", kind: "onyx.Checkbox", classes: "labeled-item-icon"},
 		{name: "label", kind: "Control"},
 		{name: "input", classes: "label-item-input"}
 	],
@@ -22,7 +22,7 @@ enyo.kind({
 		this.$.label.setContent(this.label);
 	},
 	iconChanged: function() {
-		this.$.icon.setSrc(this.icon);
+		//this.$.icon.setSrc(this.icon);
 	},
 	getValue: function() {
 		return this.$.input.getValue();
