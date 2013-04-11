@@ -14,7 +14,7 @@ enyo.kind({
 				{name: "info", kind: "Scroller", classes: "enyo-fit", components: [
 					{kind: "onyx.Groupbox", classes:"settings", components: [
 						{components:[
-							{kind:"onyx.ToggleButton", onChange:"toggleChanged", classes: "labeled-item-icon"},
+							{kind:"onyx.ToggleButton", onChange:"toggleChanged", function_name: "VOL", classes: "labeled-item-icon"},
 							{content: "Volume", kind: "Control"},
 						]},
 					]},
@@ -55,8 +55,24 @@ enyo.kind({
 					{kind: "onyx.Groupbox", classes: "onyx-groupbox settings", onchange: "mapTypeChange", components: [
 						{kind: "onyx.GroupboxHeader", content: "Technical Indicator"},
 						{components:[
-							{kind:"onyx.ToggleButton", onChange:"toggleChanged", function_name: "RSI", classes: "labeled-item-icon"},
-							{content: "RSI(14)", kind: "Control"},
+							{kind:"onyx.ToggleButton", onChange:"toggleChanged", config:{function: "RSI", seperate_yaxis: true, series:[{name:"RSI", chart_type: 'line', output_index:1}]}, classes: "labeled-item-icon"},
+							{content: "RSI", kind: "Control"},
+							{kind: "onyx.MenuDecorator", style:"display:inline-block;float:right",  ontap: "tapHandler", components: [
+								{content:"14"},
+								{kind: "onyx.ContextualPopup",
+									maxHeight: "150",
+								//	title: "Period",
+									floating: true,
+									actionButtons:[
+										{content: "Submit"}
+									],
+									components: [
+										{kind: "onyx.InputDecorator", alwaysLooksFocused: true, components: [
+											{kind: "onyx.Input", placeholder: "Enter Param"}
+										]}
+									]
+								}
+							]}
 						]},
 						{components:[
 							{kind:"onyx.ToggleButton", onChange:"toggleChanged", function_name: "STOCH", classes: "labeled-item-icon"},
@@ -110,6 +126,14 @@ enyo.kind({
 	max: 100,
 	value: 100,
 	unit: "%", 
+	tapHandler: function(inSender, inEvent) { 
+		if (inEvent.actionButton) {
+	       console.log(inSender); 
+	       console.log(inEvent);
+
+	       inEvent.popup.hide();
+   		}
+    },
 	toggleMovingAverageChanged: function(inSender) { 
 
 		var period;
@@ -120,7 +144,7 @@ enyo.kind({
 		if(inSender.function_name == "SMA")
 			period = this.$.smaPicker.selected.content;
 
-		this.doMovingAverageChanged({enabled: inSender.value, function_name: inSender.function_name, period: period});
+		this.doMovingAverageChanged({enabled: inSender.value, function_name: inSender.function_name, param: [period]});
 	},
 	toggleChanged: function(inSender) { 
 		this.doIndicatorChanged({enabled: inSender.value, function_name: inSender.function_name});

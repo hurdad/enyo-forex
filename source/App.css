@@ -34,7 +34,6 @@
 	background-color: #226B9A;
 }
 
-
 .pullout {
 	position: absolute;
 	top: 0;
@@ -49,7 +48,7 @@
 	height: 100%;
 	width: 20px;
 	left: -20px;
-	background: url(../images/sliding-shadow.png) repeat-y;
+	background: url(../assets/sliding-shadow.png) repeat-y;
 	background-size: 20px 2px;
 }
 

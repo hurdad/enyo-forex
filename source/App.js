@@ -22,7 +22,7 @@ enyo.kind({
                         {kind: "onyx.Button", content: "Add Indicator", ontap:"addIndicatorTapped"},
                     ]},
                 ]},
-                {fit: true, style: "position: relative;", components: [
+                {kind:"enyo.Scroller", fit: true, style: "position: relative;", components: [
                     {kind:"Chart", name: "myChart"},
                     {kind:"Summary", name: "mySummary", showing: false},
                 ]},
@@ -84,7 +84,7 @@ enyo.kind({
             this.$.myLockButton.setContent("Lock"); 
         }else {
             this.$.mainPanels.draggable = false;
-            this.$.myLockButton.setContent("Un Lock"); 
+            this.$.myLockButton.setContent("Unlock"); 
         }
     }
 });
