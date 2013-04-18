@@ -8,5 +8,7 @@ enyo.depends(
     "Chart.js",
     "Pullout.js",
     "LabeledItem.js",
-    "Summary.js"
+    "Summary.js",
+    "ParamPicker.js",
+    "Indicators"
  );

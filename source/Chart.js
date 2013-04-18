@@ -80,7 +80,7 @@ enyo.kind({
 		  			title: {
 		  				text: 'Price'
 		  			}, 
-		  			height: 250,
+		  			height: 225,
 		  			lineWidth: 2
 		  		}
 		  	],
@@ -162,7 +162,7 @@ enyo.kind({
 		for (var i = 0; i < this.ta_array.length; i++) {
 
 			var ta_request = new enyo.JsonpRequest({
-				url: "http://10.10.0.11/doo-forex/ta",
+				url: "http://75.80.174.85/doo-forex/ta",
 				callbackName: "callback",
 				function: this.ta_array[i]
 			});
@@ -201,10 +201,12 @@ enyo.kind({
 
 	showTechnicalIndicator: function(e) {
 
+		var top_offset = 200;
+
 		//check for toggle
 		if(e.enabled){
 			
-			this.ta_array.push(e.function_name);
+			this.ta_array.push(e.config.function);
 
 			var start, end;
 
@@ -214,21 +216,20 @@ enyo.kind({
 				start = Math.round(b.min);
 				end = Math.round(b.max);
 			}else{
-
 				start = this.min;
 				end = this.max;
 			}
 
 		    //add new series
-		    if(e.function_name != "EMA" && e.function_name != "SMA" ){
-
+		    if(e.config.yAxis != null){
+		  		//new axis
 		    	this.secondary_axis_count++;
-		    	var top = 185 + (this.secondary_axis_count * 120);
+		    	var top = top_offset + (this.secondary_axis_count * 120);
 	
-		        this.stockchart.addAxis({ // Secondary yAxis
-		            id: 'axis-' + e.function_name,
+		    	var axis = { // Secondary yAxis
+		            id: 'axis-' + e.config.function,
 		            title: {
-		                text:  e.function_name
+		                text:  e.config.function
 		            },
 		            top: top,
 		            height: 100,
@@ -239,25 +240,37 @@ enyo.kind({
 		                x: 0,
 		                y: -2
 		            }
-		        });
+		        };
 
-		        this.stockchart.addSeries({
-		            id: 'series-' + e.function_name,
-		            name: e.function_name,
-		            type: 'line',
-		           	dataGrouping: {
-						enabled: false
-					},
-		            yAxis: 'axis-' + e.function_name,
-		        });
+		        //merge
+				jQuery.extend(axis, e.config.yAxis);
+			
+				//add
+		        this.stockchart.addAxis(axis);
+
+		        //loop series
+		        for (var i = 0; i < e.config.series.length; i++) {
+   					
+			        this.stockchart.addSeries({
+			            id: 'series-' + e.config.series[i].name,
+			            name: e.config.series[i].name,
+			            type: e.config.series[i].chart_type,
+			           	dataGrouping: {
+							enabled: false
+						},
+			            yAxis: 'axis-' + e.config.function,
+			        });
+
+		    	}
 
 		        this.stockchart.setSize($('#' + this.$.chart.id).width(), top + 200, false);
-		    }else{
+		    }else{//use pair axis
 		    	
+		    	//SMA or EMA
 		    	this.stockchart.addSeries({
-		    		id: 'series-' + e.function_name,
-		    		name: e.function_name,
-		    		type: 'line',
+		    		id: 'series-' + e.config.series[0].name + '-' + e.instance,
+		    		name: e.config.series[0].name,
+		    		type: e.config.series[0].chart_type,
 		    		dataGrouping: {
 						enabled: false
 					},
@@ -266,67 +279,76 @@ enyo.kind({
 		    }
 
 		    var request = new enyo.JsonpRequest({
-				url: "http://10.10.0.11/doo-forex/ta",
+				url: "http://75.80.174.85/doo-forex/ta",
 				callbackName: "callback",
-				function: e.function_name
+				function: e.config.function,
+				instance: e.instance,
+				series: e.config.series
 			});
 
 		    request.response(enyo.bind(this, "processTechnicalIndicatorData"));
 
-		    console.log(enyo.json.stringify(e.param));
-
 		    if(!this.drilldown)
-		    	request.go({ pair: this.pair, function: e.function_name, function_param_arr: enyo.json.stringify(e.param), start: start, end: end, timeslice: this.ts_len + this.ts_duration });
+		    	request.go({ pair: this.pair, function: e.config.function, function_param_arr: enyo.json.stringify(e.params), start: start, end: end, timeslice: this.ts_len + this.ts_duration });
 		    else
-		    	request.go({ pair: this.pair, function: e.function_name, function_param_arr: enyo.json.stringify(e.param), start: start, end: end});
+		    	request.go({ pair: this.pair, function: e.config.function, function_param_arr: enyo.json.stringify(e.params), start: start, end: end});
 
-		}else{
-
- 			if(e.function_name != "EMA" && e.function_name != "SMA" )
+		}else{//Remove Axis
+ 		
+ 			if(e.config.yAxis != null)
 				this.secondary_axis_count--;
-			this.ta_array = this.removeA(this.ta_array, e.function_name);
 
-			//remove series
-			this.stockchart.get('series-' + e.function_name).remove();
+			this.ta_array = this.removeA(this.ta_array, e.config.function);
+
+			//loop series
+ 			for (var i = 0; i < e.config.series.length; i++){
+ 				
+ 				if(e.instance !== undefined)
+					//remove series
+					this.stockchart.get('series-' + e.config.series[i].name + '-' + e.instance).remove();
+				else
+					//remove series
+					this.stockchart.get('series-' + e.config.series[i].name).remove();
+			}
 
 			//remove axis
-			if(e.function_name != "EMA" && e.function_name != "SMA" ){
-            	this.stockchart.get('axis-' + e.function_name).remove();    
+			if(e.config.yAxis != null){
+            	this.stockchart.get('axis-' + e.config.function).remove();    
 
-				var top = 185 + (this.secondary_axis_count * 120);
+				var top = top_offset + (this.secondary_axis_count * 120);
 	          	this.stockchart.setSize($('#' + this.$.chart.id).width(), top + 200, false);
 	        }
-		}
-
-	
+		}	
 	},
 
 	processTechnicalIndicatorData: function(inRequest, inResponse) {
 
 		if (!inResponse) return;     
 
-		ta = [],
-		dataLength = inResponse.length;
-			
-		for (i = 0; i < dataLength; i++) {
-			ta.push([
-				inResponse[i][0], // the date
-				inResponse[i][1], // val
-			]);
-		}
+		for (var i = 0; i < inRequest.series.length; i++){
 
+			var ta = [];
+			for (j = 0; j < inResponse.length; j++) {
+				ta.push([
+					inResponse[j][0], // the date
+					inResponse[j][inRequest.series[i].output_index], // val
+				]);
+			}
+
+			if(inRequest.instance !== undefined)
 	
-		this.stockchart.get('series-' + inRequest.function).setData(ta);
+				this.stockchart.get('series-' + inRequest.series[i].name + '-' + inRequest.instance).setData(ta);
+			else
+				this.stockchart.get('series-' + inRequest.series[i].name).setData(ta);
 
+		}
 	},
 
     afterSetExtremes: function(e) {
     	
     	if(!this.drilldown) return;
 
-
  		this.stockchart.showLoading('Loading data from server...');
-
 
     	//Series Data
 		var request = new enyo.JsonpRequest({
@@ -367,6 +389,7 @@ enyo.kind({
 		this.stockchart.hideLoading();
     	
     },
+
     removeA: function(arr) {
 	    var what, a = arguments, L = a.length, ax;
 	    while (L > 1 && arr.length) {

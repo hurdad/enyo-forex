@@ -87,7 +87,7 @@
 
     	//jsonp request
     	var request = new enyo.JsonpRequest({
-            url: "http://10.10.0.11/doo-forex/live",
+            url: "http://75.80.174.85/doo-forex/live",
             callbackName: "callback"
          });
 

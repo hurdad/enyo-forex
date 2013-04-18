@@ -33,7 +33,7 @@ enyo.kind({
                
             ]},
         ]},
-        {kind: "Pullout", name: "myPullout", classes: "pullout", onMovingAverageChanged: "movingAverageChanged", onIndicatorChanged: "indicatorChanged"},
+        {kind: "Pullout", name: "myPullout", classes: "pullout", onIndicatorChanged: "indicatorChanged"},
 
     ],
     constructor: function() {
@@ -67,9 +67,6 @@ enyo.kind({
     onPairChange: function(inSender, inEvent) {
         this.pair = inEvent.pair;
         this.updateChart();
-    },
-    movingAverageChanged: function(inSender, inEvent) { 
-        this.$.myChart.showTechnicalIndicator(inEvent);
     },
     indicatorChanged: function(inSender, inEvent) { 
         this.$.myChart.showTechnicalIndicator(inEvent);
