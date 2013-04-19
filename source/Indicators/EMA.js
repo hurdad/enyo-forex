@@ -1,7 +1,7 @@
 enyo.kind({
 	name: "EMA",
 	published: {
-		instance: null,
+		instance: 0,
 		param1: 20,
 		label: "Exponential"
 	},
@@ -36,6 +36,5 @@ enyo.kind({
 	valueChanged: function(inSender, inEvent) {
 		//disable
 		this.$.toggle.setValue(false);
-		this.doToggleChanged({enabled: false, instance: this.instance, config: this.config, params:[this.$.picker1.getValue()]});
 	}
 });

@@ -1,6 +1,7 @@
 enyo.kind({
 	name: "ROC",
 	published: {
+		instance: 0,
 		label: "ROC"
 	},
 	events: {
@@ -24,6 +25,6 @@ enyo.kind({
 		this.$.label.setContent(this.label);
 	},
 	toggleChangedHandler: function(inSender) { 
-		this.doToggleChanged({enabled: inSender.value, config: this.config});
+		this.doToggleChanged({enabled: inSender.value, instance: this.instance,config: this.config});
 	}
 });

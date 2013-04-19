@@ -40,7 +40,7 @@
     	this.inherited(arguments);
        
        	//start refreshing default 500ms
-      	this.refreshIntervalID = setInterval(enyo.bind(this, "refreshQuotes"), 500);
+      	this.refreshIntervalID = setInterval(enyo.bind(this, "refreshQuotes"), 1000);
     },
     setupItem: function(inSender, inEvent) {
     	//init vars

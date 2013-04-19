@@ -1,6 +1,7 @@
 enyo.kind({
 	name: "MACD",
 	published: {
+		instance: 0,
 		param1: 12,
 		param2: 26,
 		label: "MACD"
@@ -36,11 +37,10 @@ enyo.kind({
 		this.$.picker2.updateValue();
 	},
 	toggleChangedHandler: function(inSender) { 
-		this.doToggleChanged({enabled: inSender.value, config: this.config, params:[this.$.picker1.getValue(), this.$.picker2.getValue()]});
+		this.doToggleChanged({enabled: inSender.value, instance: this.instance, config: this.config, params:[this.$.picker1.getValue(), this.$.picker2.getValue()]});
 	},
 	valueChanged: function(inSender, inEvent) {
 		//disable
 		this.$.toggle.setValue(false);
-		this.doToggleChanged({enabled: false, config: this.config, params:[this.$.picker1.getValue(), this.$.picker2.getValue()]});
 	}
 });

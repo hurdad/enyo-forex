@@ -22,7 +22,7 @@ enyo.kind({
 	rendered: function(){
 		this.inherited(arguments); 
 
-		//redner new stockchart
+		//render new stockchart
 		this.stockchart = new Highcharts.StockChart({
 		  	chart: {
 		  		renderTo: this.$.chart.hasNode(),
@@ -122,9 +122,12 @@ enyo.kind({
 
 			var sec = to_seconds_factor[ts_duration];
 			min = max - (300 * 9 * sec * ts_len * 1000);
+
+			if(min < Date.UTC(2011,01,01))
+				min = Date.UTC(2011,01,01);
 		}else {
 
-			//Min for auto nav is alld ata
+			//Min for auto nav is all data
 			min = Date.UTC(2011,01,01);
 		}
 
@@ -143,6 +146,7 @@ enyo.kind({
  		var pair_request = new enyo.JsonpRequest({
 	        url: "http://75.80.174.85/doo-forex/ohlc",
 	        callbackName: "callback",
+	        pair: this.pair,
 	        min: min,
 	        max: max
 	    });
@@ -158,21 +162,24 @@ enyo.kind({
 			pair_request.go({ pair: pair, start: min, end: max, timeslice: ts_len + ts_duration });
 		}
 
-		//update tas
+		//update ta's
 		for (var i = 0; i < this.ta_array.length; i++) {
 
 			var ta_request = new enyo.JsonpRequest({
 				url: "http://75.80.174.85/doo-forex/ta",
 				callbackName: "callback",
-				function: this.ta_array[i]
+				function: this.ta_array[i].function,
+				instance: this.ta_array[i].instance,
+				series: this.ta_array[i].series,
+
 			});
 
 			ta_request.response(enyo.bind(this, "processTechnicalIndicatorData"));
     		
     		if(!this.drilldown)
-		    	ta_request.go({ pair: this.pair, function: this.ta_array[i], start: min, end: max, timeslice: this.ts_len + this.ts_duration });
+		    	ta_request.go({ pair: this.pair, function: this.ta_array[i].function, function_param_arr: enyo.json.stringify(this.ta_array[i].params), start: min, end: max, timeslice: this.ts_len + this.ts_duration });
 		    else
-		    	ta_request.go({ pair: this.pair, function: this.ta_array[i], start: min, end: max});
+		    	ta_request.go({ pair: this.pair, function: this.ta_array[i].function, function_param_arr: enyo.json.stringify(this.ta_array[i].params), start: min, end: max});
 
 		}
 	},
@@ -184,6 +191,9 @@ enyo.kind({
       	//set data
       	this.stockchart.get('series-pair').setData(inResponse);
       	this.stockchart.get('series-nav').setData(inResponse);
+
+      	//set name
+      	this.stockchart.get('series-pair').name = inRequest.pair;
 		
       	if(!this.drilldown){
       		var range = inRequest.max - inRequest.min;
@@ -206,7 +216,13 @@ enyo.kind({
 		//check for toggle
 		if(e.enabled){
 			
-			this.ta_array.push(e.config.function);
+			this.ta_array.push({
+				id: e.config.function + '-' + e.instance,
+				function: e.config.function,
+				instance: e.instance,
+				series: e.config.series,
+				params: e.params
+			});
 
 			var start, end;
 
@@ -252,7 +268,7 @@ enyo.kind({
 		        for (var i = 0; i < e.config.series.length; i++) {
    					
 			        this.stockchart.addSeries({
-			            id: 'series-' + e.config.series[i].name,
+			            id: 'series-' + e.config.series[0].name + '-' + e.instance,
 			            name: e.config.series[i].name,
 			            type: e.config.series[i].chart_type,
 			           	dataGrouping: {
@@ -269,7 +285,7 @@ enyo.kind({
 		    	//SMA or EMA
 		    	this.stockchart.addSeries({
 		    		id: 'series-' + e.config.series[0].name + '-' + e.instance,
-		    		name: e.config.series[0].name,
+		    		name: e.config.series[0].name + ' ' + e.params.join(','),
 		    		type: e.config.series[0].chart_type,
 		    		dataGrouping: {
 						enabled: false
@@ -298,17 +314,16 @@ enyo.kind({
  			if(e.config.yAxis != null)
 				this.secondary_axis_count--;
 
-			this.ta_array = this.removeA(this.ta_array, e.config.function);
+			//remove ta from array
+			for (var i = 0; i < this.ta_array.length; i++){
+				if(e.config.function + '-' + e.instance == this.ta_array[i].id)
+					this.ta_array.remove(i);
+			}
 
 			//loop series
  			for (var i = 0; i < e.config.series.length; i++){
- 				
- 				if(e.instance !== undefined)
-					//remove series
-					this.stockchart.get('series-' + e.config.series[i].name + '-' + e.instance).remove();
-				else
-					//remove series
-					this.stockchart.get('series-' + e.config.series[i].name).remove();
+				//remove series
+				this.stockchart.get('series-' + e.config.series[i].name + '-' + e.instance).remove();			
 			}
 
 			//remove axis
@@ -350,7 +365,7 @@ enyo.kind({
 
  		this.stockchart.showLoading('Loading data from server...');
 
-    	//Series Data
+    	//pair Series Data
 		var request = new enyo.JsonpRequest({
 			url: "http://75.80.174.85/doo-forex/ohlc",
 			callbackName: "callback"
@@ -358,6 +373,23 @@ enyo.kind({
 
 	    request.response(enyo.bind(this, "processDrillData"));
 	    request.go({ pair: this.pair, start: Math.round(e.min), end: Math.round(e.max) });
+
+
+	    //update ta's
+		for (var i = 0; i < this.ta_array.length; i++) {
+
+			var ta_request = new enyo.JsonpRequest({
+				url: "http://75.80.174.85/doo-forex/ta",
+				callbackName: "callback",
+				function: this.ta_array[i].function,
+				instance: this.ta_array[i].instance,
+				series: this.ta_array[i].series,
+
+			});
+
+			ta_request.response(enyo.bind(this, "processTechnicalIndicatorData"));	
+		   	ta_request.go({ pair: this.pair, function: this.ta_array[i].function, function_param_arr: enyo.json.stringify(this.ta_array[i].params), start: Math.round(e.min), end: Math.round(e.max)});
+		}
 	},
 
 	processDrillData: function(inRequest, inResponse) {
@@ -388,16 +420,12 @@ enyo.kind({
 
 		this.stockchart.hideLoading();
     	
-    },
-
-    removeA: function(arr) {
-	    var what, a = arguments, L = a.length, ax;
-	    while (L > 1 && arr.length) {
-	        what = a[--L];
-	        while ((ax= arr.indexOf(what)) !== -1) {
-	            arr.splice(ax, 1);
-	        }
-    	}
-    	return arr;
     }
 });
+
+// Array Remove - By John Resig (MIT Licensed)
+Array.prototype.remove = function(from, to) {
+	var rest = this.slice((to || from) + 1 || this.length);
+	this.length = from < 0 ? this.length + from : from;
+	return this.push.apply(this, rest);
+};
