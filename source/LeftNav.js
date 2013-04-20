@@ -23,7 +23,7 @@
         {name: "list", kind: "List", classes:"list", fit: true, onSetupItem: "setupItem", components: [
             {name: "item", ontap: "itemTap", classes: "item enyo-border-box", components: [
                 {name: "pair", tag: "span"},
-                { tag: "span", style: "float: right; color: black;" ,components:[
+                {tag: "span", style: "float: right; color: black;" ,components:[
                     {name: "bid", tag: "span"},
                     {content: " / ",  tag: "span"},
                     {name: "offer", tag: "span"},
@@ -43,6 +43,7 @@
       	this.refreshIntervalID = setInterval(enyo.bind(this, "refreshQuotes"), 1000);
     },
     setupItem: function(inSender, inEvent) {
+
     	//init vars
     	var i = inEvent.index;
         var item = this.results[i];
@@ -102,7 +103,7 @@
 
         //force setupItem
         this.$.list.setCount(this.results.length);
-        this.$.list.reset();
+        this.$.list.refresh();
     },
     refreshHandler: function(inSender, inEvent){
 

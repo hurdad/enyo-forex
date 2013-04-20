@@ -5,7 +5,7 @@ enyo.kind({
 		stockchart : null
 	},
 	events: {
-		
+		onTechnicalAnalysisUpdateCurrentValue: ""
 	},
 	components: [
 		{name: 'chart', classes: 'enyo-highstock', onresize:"resizeHandler"}
@@ -348,14 +348,20 @@ enyo.kind({
 					inResponse[j][0], // the date
 					inResponse[j][inRequest.series[i].output_index], // val
 				]);
+
+				//get last
+				if(j == inResponse.length - 1)
+					this.doTechnicalAnalysisUpdateCurrentValue({
+						date: inResponse[j][0], // the date
+						name: inRequest.series[i].name,
+						instance: inRequest.instance,
+						val: inResponse[j][inRequest.series[i].output_index], // val
+					});
 			}
 
-			if(inRequest.instance !== undefined)
-	
-				this.stockchart.get('series-' + inRequest.series[i].name + '-' + inRequest.instance).setData(ta);
-			else
-				this.stockchart.get('series-' + inRequest.series[i].name).setData(ta);
-
+			//set series ta data	
+			this.stockchart.get('series-' + inRequest.series[i].name + '-' + inRequest.instance).setData(ta);
+		
 		}
 	},
 
@@ -396,30 +402,9 @@ enyo.kind({
 
     	if (!inResponse) return;
     	
-		// split the data set into ohlc and volume
-		var ohlc = [],
-		volume = [],
-		dataLength = inResponse.length;
-			
-		for (i = 0; i < dataLength; i++) {
-			ohlc.push([
-				inResponse[i][0], // the date
-				inResponse[i][1], // open
-				inResponse[i][2], // high
-				inResponse[i][3], // low
-				inResponse[i][4] // close
-			]);
-			
-			volume.push([
-				inResponse[i][0], // the date
-				inResponse[i][5] // the volume
-			])
-		}
-
-		this.stockchart.get('series-pair').setData(ohlc);
-
+    	//set pair series data
+		this.stockchart.get('series-pair').setData(inResponse);
 		this.stockchart.hideLoading();
-    	
     }
 });
 
