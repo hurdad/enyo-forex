@@ -2,6 +2,9 @@
  enyo.kind({
  	name: "LeftNav",
  	kind: "FittableRows", 
+    published:{
+        doo_forex_url: "http://localhost/doo-forex"
+    },
  	events: {
     	onPairChange:""
 	},
@@ -88,7 +91,7 @@
 
     	//jsonp request
     	var request = new enyo.JsonpRequest({
-            url: "http://75.80.174.85/doo-forex/live",
+            url: this.doo_forex_url + "/live",
             callbackName: "callback"
          });
 

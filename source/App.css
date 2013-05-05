@@ -56,7 +56,7 @@
 	position: absolute;
 	height: 54px;
 	width: 50px;
-	top: 10px;
+	top: 5px;
 	left: -46px;
 	border-radius: 10px 0 0 10px;
 	background-color: #D8D8D8;
@@ -87,6 +87,3 @@
 	margin-right: 15px;
 }
 
-.label-item-input {
-	float: right;
-}

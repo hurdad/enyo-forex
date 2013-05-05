@@ -2,7 +2,7 @@ enyo.kind({
     name: "App",
     components: [
         {kind: "Panels", name: "mainPanels", classes: "app-panels enyo-fit", arrangerKind: "CollapsingArranger", components: [
-            {kind: "LeftNav", name:"navPanels", onPairChange:"onPairChange"},
+            {kind: "LeftNav", doo_forex_url: "http://75.80.174.85/doo-forex", name:"navPanels", onPairChange:"onPairChange"},
             {kind: "FittableRows", components: [
                 {kind: "Scroller", classes:"onyx-toolbar", touchOverscroll:false, touch:true, vertical:"hidden", style:"margin:0px;", thumb: false, components: [
                     {classes: "onyx-toolbar-inline", style: "white-space: nowrap;", components: [
@@ -19,7 +19,7 @@ enyo.kind({
                     ]},
                 ]},
                 {kind:"enyo.Scroller", fit: true, style: "position: relative;", components: [
-                    {kind:"Chart", name: "myChart", onTechnicalAnalysisUpdateCurrentValue: "technicalAnalysisUpdateCurrentValue"},
+                    {kind:"Chart", name: "myChart",  doo_forex_url: "http://75.80.174.85/doo-forex", onTechnicalAnalysisUpdateCurrentValue: "technicalAnalysisUpdateCurrentValue"},
                 ]},
                 {kind: "onyx.Toolbar", layoutKind:"FittableColumnsLayout", noStretch: true, classes: "footer-toolbar", components: [
                     {kind: "onyx.Grabber", ontap:"toggleFullScreen"},

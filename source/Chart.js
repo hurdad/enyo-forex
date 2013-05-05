@@ -2,7 +2,8 @@ enyo.kind({
 	name: 'Chart',
 	kind: 'Control',
 	published: {
-		stockchart : null
+		stockchart : null,
+		doo_forex_url: "http://localhost/doo-forex"
 	},
 	events: {
 		onTechnicalAnalysisUpdateCurrentValue: ""
@@ -21,6 +22,9 @@ enyo.kind({
     },
 	rendered: function(){
 		this.inherited(arguments); 
+
+		//Set theme - see ChartTheme.js
+		Highcharts.setOptions(Highcharts.theme);
 
 		//render new stockchart
 		this.stockchart = new Highcharts.StockChart({
@@ -144,7 +148,7 @@ enyo.kind({
   		}
 	
  		var pair_request = new enyo.JsonpRequest({
-	        url: "http://75.80.174.85/doo-forex/ohlc",
+	        url: this.doo_forex_url + "/ohlc",
 	        callbackName: "callback",
 	        pair: this.pair,
 	        min: min,
@@ -166,7 +170,7 @@ enyo.kind({
 		for (var i = 0; i < this.ta_array.length; i++) {
 
 			var ta_request = new enyo.JsonpRequest({
-				url: "http://75.80.174.85/doo-forex/ta",
+				url: this.doo_forex_url + "/ta",
 				callbackName: "callback",
 				function: this.ta_array[i].function,
 				instance: this.ta_array[i].instance,
@@ -295,7 +299,7 @@ enyo.kind({
 		    }
 
 		    var request = new enyo.JsonpRequest({
-				url: "http://75.80.174.85/doo-forex/ta",
+				url: this.doo_forex_url + "/ta",
 				callbackName: "callback",
 				function: e.config.function,
 				instance: e.instance,
@@ -373,7 +377,7 @@ enyo.kind({
 
     	//pair Series Data
 		var request = new enyo.JsonpRequest({
-			url: "http://75.80.174.85/doo-forex/ohlc",
+			url: this.doo_forex_url + "/ohlc",
 			callbackName: "callback"
 		});
 
